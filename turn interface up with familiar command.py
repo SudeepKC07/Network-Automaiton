@@ -2,15 +2,25 @@ import csv
 from netmiko import ConnectHandler
 import traceback
 import re
+import requests
+from io import StringIO
 
 devices = []
-csv_file = r"C:\Users\sukcaaaa\OneDrive - TOLL GROUP\Fortigate Lists\fortigates.csv"
+
+# GitHub raw CSV URL
+csv_url = "https://raw.githubusercontent.com/SudeepKC07/Network-Automaiton/device-loading/Fortigate Lists/fortigates.csv"
+
+# Fetch CSV from GitHub
+response = requests.get(csv_url)
+response.raise_for_status()  # Raise error if request fails
+csv_file = StringIO(response.text)
+
+# Read devices from CSV
+reader = csv.DictReader(csv_file)
+for row in reader:
+    devices.append(row)
 
 print (f"{'DeviceIP:':<15} {'Interface Name:':<15} {'IP Address:':<15} {'Status:':<15}")
-with open(csv_file, mode='r') as file:
-    reader = csv.DictReader(file)
-    for row in reader:
-        devices.append(row)
 
 # Regex pattern to extract interface details from each line
 interface_pattern = re.compile(
@@ -42,7 +52,6 @@ for device in devices:
                     print(f"DEBUG: Interface={current_interface}, IP={current_ip}, Status={current_status}")
                     if current_ip == "0.0.0.0 0.0.0.0" and current_status.lower() == "down":
                         interfaces_to_turn_up.append(current_interface)
-                        print(f"DEBUG: Adding interface {current_interface} for status change")
         
         if interfaces_to_turn_up:
             print(f"Interfaces to set UP on {device['host']}: {interfaces_to_turn_up}")
