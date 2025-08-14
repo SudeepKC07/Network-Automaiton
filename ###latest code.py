@@ -1,5 +1,5 @@
 ###latest code
-##Sudeep KC
+##15/08/2025
 
 import csv
 from netmiko import ConnectHandler
@@ -53,7 +53,7 @@ for device in devices:
                 if match:
                     current_interface, current_ip, current_status = match.groups()
                     print(f"DEBUG: Interface={current_interface}, IP={current_ip}, Status={current_status}")
-                    if current_ip == "0.0.0.0 0.0.0.0" and current_status.lower() == "down":
+                    if current_ip == "0.0.0.0 0.0.0.0" and current_status.lower() == "up":
                         interfaces_to_turn_up.append(current_interface)
         
         if interfaces_to_turn_up:
@@ -62,8 +62,8 @@ for device in devices:
                 commands = [
                     "config system interface",
                     f"edit {intf}",
-                    "set status up",
-                    "set description interface_turn_up_by_script",
+                    "set status down",
+                    "set description interface_turn_down_by_script",
                     "next",
                     "end"
                 ]
