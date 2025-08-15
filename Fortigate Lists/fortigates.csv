@@ -1,4 +1,4 @@
-host,username,password,port
-192.168.209.217,admin,admin,22
-192.168.209.218,admin,admin,22
-192.168.209.219,admin,admin,22
+host,username,password,port,DEV
+192.168.209.217,admin,admin,22,HO-VPN-DEV
+192.168.209.193,admin,admin,22,BR1
+192.168.209.219,admin,admin,22,BR2
