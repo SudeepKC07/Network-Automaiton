@@ -1,0 +1,151 @@
+BR1 # 
+BR1 # get system status | grep Virtual
+Virtual domains status: 1 in NAT mode, 0 in TP mode
+Virtual domain configuration: disable
+
+BR1 # get system status | grep Version
+Version: FortiGate-VM64-KVM v7.4.7,build2731,250120 (GA.M)
+Release Version Information: GA
+
+BR1 # get system console
+output              : standard 
+login               : enable 
+
+BR1 # 
+BR1 # config global
+
+command parse error before 'global'
+Command fail. Return code 1
+
+BR1 # 
+BR1 # config vdom
+
+command parse error before 'vdom'
+Command fail. Return code 1
+
+BR1 # 
+BR1 # edit root
+Unknown action 0
+
+BR1 # config system interface
+
+BR1 (interface) # edit port2
+
+BR1 (port2) # set mode static
+
+
+BR1 (port2) # set ip 10.10.20.1 255.255.255.0
+
+BR1 (port2) # set allowaccess ping ssh https
+
+BR1 (port2) # next
+
+BR1 (interface) # end
+
+BR1 # config vpn ipsec phase1-interface
+
+
+BR1 (phase1-interface) # edit BR1-HO-VPN
+edit BR1-HO-VPN
+
+BR1 (BR1-HO-VPN) # set interface port1
+
+BR1 (BR1-HO-VPN) # set ike-version 2
+
+BR1 (BR1-HO-VPN) # set keylife 28800
+
+
+BR1 (BR1-HO-VPN) # set peertype any
+
+BR1 (BR1-HO-VPN) # set net-device disable
+
+BR1 (BR1-HO-VPN) # set proposal des-sha256
+
+BR1 (BR1-HO-VPN) # set remote-gw 192.168.209.214
+
+BR1 (BR1-HO-VPN) # set psksecret password
+
+BR1 (BR1-HO-VPN) # next
+
+
+BR1 (phase1-interface) # end
+
+
+BR1 # config vpn ipsec phase2-interface
+
+BR1 (phase2-interface) # edit BR1-HO-VPN-P2
+new entry 'BR1-HO-VPN-P2' added
+
+BR1 (BR1-HO-VPN-P2) # set phase1name BR1-HO-VPN
+
+BR1 (BR1-HO-VPN-P2) # set proposal des-sha256
+
+BR1 (BR1-HO-VPN-P2) # set dhgrp 14
+
+BR1 (BR1-HO-VPN-P2) # set keylifeseconds 3600
+
+BR1 (BR1-HO-VPN-P2) # set src-subnet 10.10.20.0 255.255.255.0
+
+BR1 (BR1-HO-VPN-P2) # set dst-subnet 10.10.10.0 255.255.255.0
+
+BR1 (BR1-HO-VPN-P2) # next
+
+BR1 (phase2-interface) # end
+
+BR1 # config firewall policy
+
+BR1 (policy) # edit 1
+edit 1
+new entry '1' added
+
+BR1 (1) # set name LAN-to-HO
+
+BR1 (1) # set srcintf port2
+
+BR1 (1) # set dstintf BR1-HO-VPN
+
+BR1 (1) # set srcaddr all
+
+BR1 (1) # set dstaddr all
+
+BR1 (1) # set action accept
+
+BR1 (1) # set schedule always
+
+BR1 (1) # set service ALL
+
+BR1 (1) # next
+next
+
+
+BR1 (policy) # 
+BR1 (policy) # show system interface
+
+command parse error before 'system'
+Command fail. Return code -61
+
+BR1 (policy) # 
+BR1 (policy) # show vpn ipsec phase1-interface
+
+command parse error before 'vpn'
+Command fail. Return code -61
+
+BR1 (policy) # 
+BR1 (policy) # show vpn ipsec phase2-interface
+
+command parse error before 'vpn'
+Command fail. Return code -61
+
+BR1 (policy) # 
+BR1 (policy) # show router static
+
+command parse error before 'router'
+Command fail. Return code -61
+
+BR1 (policy) # 
+BR1 (policy) # show firewall policy
+
+command parse error before 'firewall'
+Command fail. Return code -61
+
+BR1 (policy) # exit

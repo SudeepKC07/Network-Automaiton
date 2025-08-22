@@ -1,0 +1,114 @@
+HO # 
+HO # get system status | grep Virtual
+Virtual domains status: 1 in NAT mode, 0 in TP mode
+Virtual domain configuration: disable
+
+HO # get system status | grep Version
+Version: FortiGate-VM64-KVM v7.4.7,build2731,250120 (GA.M)
+Release Version Information: GA
+
+HO # get system console
+output              : standard 
+login               : enable 
+
+HO # 
+HO # config global
+
+command parse error before 'global'
+Command fail. Return code 1
+
+HO # 
+HO # config system interface
+
+HO (interface) # 
+HO (interface) # edit port2
+
+HO (port2) # 
+HO (port2) # set mode static
+
+HO (port2) # 
+HO (port2) # set ip 10.10.10.1 255.255.255.0
+
+HO (port2) # 
+HO (port2) # set allowaccess ping ssh https
+
+
+HO (port2) # 
+HO (port2) # next
+
+HO (interface) # 
+HO (interface) # end
+
+HO # 
+HO # config vpn ipsec phase1-interface
+
+HO (phase1-interface) # 
+HO (phase1-interface) # edit HO-BR1-VPN
+
+HO (HO-BR1-VPN) # 
+HO (HO-BR1-VPN) # set interface port1
+
+HO (HO-BR1-VPN) # 
+HO (HO-BR1-VPN) # set ike-version 2
+
+HO (HO-BR1-VPN) # 
+HO (HO-BR1-VPN) # set keylife 28800
+
+HO (HO-BR1-VPN) # 
+HO (HO-BR1-VPN) # set peertype any
+
+HO (HO-BR1-VPN) # 
+HO (HO-BR1-VPN) # set net-device disable
+
+
+HO (HO-BR1-VPN) # 
+
+HO (HO-BR1-VPN) # set proposal des-sha256
+
+
+HO (HO-BR1-VPN) # 
+HO (HO-BR1-VPN) # set remote-gw 192.168.209.185
+
+HO (HO-BR1-VPN) # 
+HO (HO-BR1-VPN) # set psksecret password
+
+HO (HO-BR1-VPN) # 
+HO (HO-BR1-VPN) # next
+
+HO (phase1-interface) # 
+HO (phase1-interface) # end
+
+HO # 
+HO # config vpn ipsec phase2-interface
+
+HO (phase2-interface) # 
+HO (phase2-interface) # edit HO-BR1-VPN-P2
+
+HO (HO-BR1-VPN-P2) # 
+HO (HO-BR1-VPN-P2) # set phase1name HO-BR1-VPN
+
+HO (HO-BR1-VPN-P2) # 
+HO (HO-BR1-VPN-P2) # set proposal des-sha256
+
+HO (HO-BR1-VPN-P2) # 
+HO (HO-BR1-VPN-P2) # set dhgrp 14
+
+
+HO (HO-BR1-VPN-P2) # 
+HO (HO-BR1-VPN-P2) # set keylifeseconds 3600
+
+HO (HO-BR1-VPN-P2) # 
+HO (HO-BR1-VPN-P2) # set src-subnet 10.10.10.0 255.255.255.0
+
+
+HO (HO-BR1-VPN-P2) # 
+HO (HO-BR1-VPN-P2) # set dst-subnet 10.10.20.0 255.255.255.0
+
+HO (HO-BR1-VPN-P2) # 
+HO (HO-BR1-VPN-P2) # next
+
+HO (phase2-interface) # 
+HO (phase2-interface) # end
+
+HO # 
+HO # 

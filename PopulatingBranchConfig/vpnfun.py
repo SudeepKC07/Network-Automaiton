@@ -1,21 +1,12 @@
 # vpnfun.py
 
 def ho_vpn_name(ho_dev, br_dev):
-    """
-    HO VPN name format: HO-BR1-VPN
-    """
     return f"{ho_dev}-{br_dev}-VPN"
 
 def br_vpn_name(br_dev, ho_dev):
-    """
-    BR VPN name format: BR1-HO-VPN
-    """
     return f"{br_dev}-{ho_dev}-VPN"
 
 def hovpn(ho, br):
-    """
-    Generate HO device VPN commands for a branch
-    """
     phase1_name = ho_vpn_name(ho["DEV"], br["DEV"])
     phase2_name = f"{phase1_name}-P2"
 
@@ -47,9 +38,6 @@ def hovpn(ho, br):
            ["config vpn ipsec phase2-interface"] + phase2_cfg + ["end"]
 
 def brvpn(br, ho):
-    """
-    Generate Branch device VPN commands for HO
-    """
     phase1_name = br_vpn_name(br["DEV"], ho["DEV"])
     phase2_name = f"{phase1_name}-P2"
 

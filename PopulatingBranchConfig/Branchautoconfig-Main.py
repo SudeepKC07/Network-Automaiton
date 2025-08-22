@@ -2,8 +2,6 @@ import csv
 import requests
 from io import StringIO
 from netmiko import ConnectHandler
-import re
-import time
 
 from vpnfun import hovpn, brvpn
 from policyfun import hopolicy, brpolicy
@@ -27,30 +25,6 @@ br_devices = [d for d in devices if "BR" in d["DEV"]]
 print(f"HO devices: {[d['DEV'] for d in ho_devices]}")
 print(f"BR devices: {[d['DEV'] for d in br_devices]}")
 
-# Store VPN summary
-vpn_status_summary = []
-
-# ---------- VPN STATUS FUNCTION ----------
-def check_vpn_status(conn, vpn_name):
-    """
-    Parse VPN dec/enc counters directly from 'diagnose vpn tunnel list'.
-    """
-    try:
-        output = conn.send_command_timing("diagnose vpn tunnel list", delay_factor=2)
-        match = re.search(r"dec:pkts/bytes=(\d+)/(\d+),\s*enc:pkts/bytes=(\d+)/(\d+)", output)
-        if match:
-            dec_pkts = int(match.group(1))
-            dec_bytes = int(match.group(2))
-            enc_pkts = int(match.group(3))
-            enc_bytes = int(match.group(4))
-            status = "UP" if dec_pkts > 0 or enc_pkts > 0 else "DOWN"
-            return status, enc_pkts, dec_pkts
-        else:
-            return "DOWN / Not Found", 0, 0
-    except Exception as e:
-        print(f"❌ Error checking VPN {vpn_name}: {e}")
-        return "DOWN / Not Found", 0, 0
-
 # ---------- HO Side ----------
 for ho in ho_devices:
     print(f"\n🔹 Connecting to HO device {ho['DEV']} ({ho['host']})")
@@ -68,13 +42,10 @@ for ho in ho_devices:
 
     all_cfg = []
     all_cfg += lanconfig(ho)
-    vpn_pairs = []
 
     for br in br_devices:
-        vpn_name = f"{ho['DEV']}-{br['DEV']}-VPN"
-        vpn_pairs.append((vpn_name, ho["Gateway"], br["Gateway"]))
         all_cfg += hovpn(ho, br)
-        all_cfg += hopolicy(ho, br)
+        all_cfg += hopolicy(conn, ho, br)
         all_cfg += horoute(ho, br)
 
     # Push config
@@ -96,19 +67,6 @@ for ho in ho_devices:
         print(f"\n>>> {cmd}")
         print(conn.send_command(cmd))
 
-    # Check VPN status
-    for vpn_name, _, _ in vpn_pairs:
-        status, enc, dec = check_vpn_status(conn, vpn_name)
-        vpn_status_summary.append(
-            {
-                "device": ho["DEV"],
-                "vpn": vpn_name,
-                "status": status,
-                "enc_packets": enc,
-                "dec_packets": dec,
-            }
-        )
-
     conn.disconnect()
 
 # ---------- BR Side ----------
@@ -128,13 +86,10 @@ for br in br_devices:
 
     all_cfg = []
     all_cfg += lanconfig(br)
-    vpn_pairs = []
 
     for ho in ho_devices:
-        vpn_name = f"{br['DEV']}-{ho['DEV']}-VPN"
-        vpn_pairs.append((vpn_name, br["Gateway"], ho["Gateway"]))
         all_cfg += brvpn(br, ho)
-        all_cfg += brpolicy(br, ho)
+        all_cfg += brpolicy(conn, br, ho)
         all_cfg += brroute(br, ho)
 
     # Push config
@@ -156,25 +111,4 @@ for br in br_devices:
         print(f"\n>>> {cmd}")
         print(conn.send_command(cmd))
 
-    # Check VPN status
-    for vpn_name, _, _ in vpn_pairs:
-        status, enc, dec = check_vpn_status(conn, vpn_name)
-        vpn_status_summary.append(
-            {
-                "device": br["DEV"],
-                "vpn": vpn_name,
-                "status": status,
-                "enc_packets": enc,
-                "dec_packets": dec,
-            }
-        )
-
     conn.disconnect()
-
-# ---------- FINAL VPN STATUS SUMMARY ----------
-print("\n\n===== FINAL VPN STATUS SUMMARY =====")
-for item in vpn_status_summary:
-    print(
-        f"Device: {item['device']} | VPN: {item['vpn']} | Status: {item['status']} | "
-        f"Encrypted pkts: {item['enc_packets']} | Decrypted pkts: {item['dec_packets']}"
-    )
