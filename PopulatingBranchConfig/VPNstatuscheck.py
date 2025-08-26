@@ -7,7 +7,7 @@ from netmiko import ConnectHandler
 import re
 
 # ---------------- CSV / Device Loading ----------------
-csv_url = "https://raw.githubusercontent.com/SudeepKC07/Network-Automaiton/device-loading/Fortigate%20Lists/fortigates.csv"
+csv_url = "https://raw.githubusercontent.com/SudeepKC07/DeviceLists/main/DeviceLists/fortigates.csv"
 
 resp = requests.get(csv_url)
 resp.raise_for_status()
