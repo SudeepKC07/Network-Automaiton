@@ -11,7 +11,7 @@ from routefun import horoute, brroute
 from LANconfig import lanconfig
 
 # CSV URL
-csv_url = "https://raw.githubusercontent.com/SudeepKC07/Network-Automaiton/device-loading/Fortigate%20Lists/fortigates.csv"
+csv_url = "https://raw.githubusercontent.com/SudeepKC07/DeviceLists/main/DeviceLists/fortigates.csv"
 
 # Fetch & read CSV
 resp = requests.get(csv_url)
