@@ -1,4 +1,4 @@
-#latest cahnge date: 2025-08-22
+#latest cahnge date: 2025-08-27 2:06PM
 
 import csv
 import requests
@@ -43,18 +43,22 @@ for ho in ho_devices:
         continue
 
     all_cfg = []
-    all_cfg += lanconfig(ho)
+    all_cfg += lanconfig(conn, ho)
 
     for br in br_devices:
-        all_cfg += hovpn(ho, br)
+        all_cfg += hovpn(conn, ho, br)
         all_cfg += hopolicy(conn, ho, br)
-        all_cfg += horoute(ho, br)
+        all_cfg += horoute(conn, ho, br)
 
     # Push config
     try:
-        output = conn.send_config_set(all_cfg)
-        print("\n===== CONFIGURATION CHANGES PUSHED =====")
-        print(output)
+        if all_cfg and any(cmd.strip() for cmd in all_cfg):
+            print("\n===== CONFIGURATION CHANGES PUSHED =====")
+            output = conn.send_config_set(all_cfg)
+            print(output)
+        else:
+            print("\n===== CONFIGURATION CHANGES PUSHED =====")
+            print("\n✅ No new configuration changes needed; skipping push.")
     except Exception as e:
         print(f"❌ Error pushing config to {ho['DEV']}: {e}")
 
@@ -87,18 +91,22 @@ for br in br_devices:
         continue
 
     all_cfg = []
-    all_cfg += lanconfig(br)
+    all_cfg += lanconfig(conn, br)
 
     for ho in ho_devices:
-        all_cfg += brvpn(br, ho)
+        all_cfg += brvpn(conn, br, ho)
         all_cfg += brpolicy(conn, br, ho)
-        all_cfg += brroute(br, ho)
+        all_cfg += brroute(conn, br, ho)
 
     # Push config
     try:
-        output = conn.send_config_set(all_cfg)
-        print("\n===== CONFIGURATION CHANGES PUSHED =====")
-        print(output)
+        if all_cfg and any(cmd.strip() for cmd in all_cfg):
+            print("\n===== CONFIGURATION CHANGES PUSHED =====")
+            output = conn.send_config_set(all_cfg)
+            print(output)
+        else:
+            print("\n===== CONFIGURATION CHANGES PUSHED =====")
+            print("\n✅ No new configuration changes needed; skipping push.")
     except Exception as e:
         print(f"❌ Error pushing config to {br['DEV']}: {e}")
 
