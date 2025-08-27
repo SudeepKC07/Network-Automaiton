@@ -1,4 +1,4 @@
-#latest cahnge date: 2025-08-27
+#latest cahnge date: 2025-08-27 2:06PM
 
 import csv
 import requests
@@ -52,9 +52,13 @@ for ho in ho_devices:
 
     # Push config
     try:
-        output = conn.send_config_set(all_cfg)
-        print("\n===== CONFIGURATION CHANGES PUSHED =====")
-        print(output)
+        if all_cfg and any(cmd.strip() for cmd in all_cfg):
+            print("\n===== CONFIGURATION CHANGES PUSHED =====")
+            output = conn.send_config_set(all_cfg)
+            print(output)
+        else:
+            print("\n===== CONFIGURATION CHANGES PUSHED =====")
+            print("\n✅ No new configuration changes needed; skipping push.")
     except Exception as e:
         print(f"❌ Error pushing config to {ho['DEV']}: {e}")
 
