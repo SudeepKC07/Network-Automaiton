@@ -48,7 +48,8 @@ def hopolicy(conn, ho_device, br_device):
     vpnif = _vpn_if(local, peer)
 
     existing_ids, policies = get_existing_policies(conn)
-    all_cfg = ["config firewall policy"]
+    all_cfg = []
+    policy_cfgs = [] #store only new policy lines
 
     # Define two policies
     policy_defs = [
@@ -84,10 +85,12 @@ def hopolicy(conn, ho_device, br_device):
             ):
                 duplicate = True
                 break
-        if not duplicate:
+        if duplicate:
+            print(f"✅ Policy {policy['name']} already exists; skipping...")
+        else:
             policy_id = get_next_policy_id(existing_ids)
             existing_ids.append(policy_id)
-            all_cfg += [
+            policy_cfgs += [
                 f"edit {policy_id}",
                 f"set name {policy['name']}",
                 f"set srcintf {policy['srcintf']}",
@@ -99,8 +102,10 @@ def hopolicy(conn, ho_device, br_device):
                 f"set service {policy['service']}",
                 "next"
             ]
-    all_cfg.append("end")
-    return all_cfg
+    if policy_cfgs:
+        return ["config firewall policy"] + policy_cfgs + ["end"]
+    else:
+        return [] 
 
 def brpolicy(conn, br_device, ho_device):
     # Same logic, swap roles
